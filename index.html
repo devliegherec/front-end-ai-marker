@@ -684,7 +684,62 @@
       color: #fff;
       font-size: 6px;
       z-index: 1;
+      cursor: default;
     }
+
+    .ai-tooltip {
+      position: fixed;
+      display: none;
+      width: 260px;
+      background: #fff;
+      border: 1px solid #e5e7eb;
+      border-radius: 10px;
+      box-shadow: 0 4px 18px rgba(0,0,0,0.12);
+      z-index: 9999;
+      pointer-events: none;
+      overflow: hidden;
+    }
+    .ai-tooltip-date {
+      padding: 8px 14px 0;
+      font-size: 10px;
+      color: #9ca3af;
+      font-weight: 500;
+    }
+    .ai-tooltip-body {
+      padding: 4px 14px 12px;
+      font-size: 12px;
+      color: #374151;
+      line-height: 1.6;
+    }
+    .ai-tooltip-refs {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 7px 14px;
+      border-top: 1px solid #e5e7eb;
+      font-size: 10px;
+      font-weight: 500;
+      color: #9ca3af;
+      letter-spacing: 0;
+    }
+    .ai-tooltip-nav {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-weight: 400;
+      font-size: 11px;
+      color: #6b7280;
+    }
+    .ai-tooltip-nav button {
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: #9ca3af;
+      padding: 0 2px;
+      font-size: 13px;
+      line-height: 1;
+    }
+    .ai-tooltip-nav button:hover { color: #374151; }
 
     /* Sub-block (indented) */
     .sub-block {
@@ -872,6 +927,11 @@
       <div class="sidebar-nav">
         <div class="clinical-panel">
 
+          <!-- Placeholder (visible when idle) -->
+          <div id="clinical-placeholder" style="flex:1; display:flex; align-items:flex-start; padding:14px 16px; color:#9ca3af; font-size:13px; line-height:1.6; pointer-events:none; user-select:none;">
+            Start recording or type your notes here…
+          </div>
+
           <!-- Body (hidden until recording) -->
           <div class="clinical-body" id="clinical-body" style="display:none;">
             <p><span class="hl">So, this is a 62-year-old male who came in yesterday afternoon at 02:00 o'clock with crushing retrosternal chest pain radiating to the left arm.</span></p>
@@ -1003,8 +1063,8 @@
           <span class="block-row-label">Admission date and time</span>
           <div class="block-row-control">
             <div class="ai-wrap">
-              <span class="ai-spark">✦</span>
-              <input class="form-input" type="datetime-local" value="2026-02-22T14:00" style="border-color:#2563eb;" />
+              <span class="ai-spark" data-tooltip="The clinical note states the patient arrived on 22 February 2026 at 14:00. This directly answers the 'Admission date and time' question.">✦</span>
+              <input class="form-input" type="datetime-local" data-live-value="2026-02-22T14:00" style="border-color:#2563eb;" />
             </div>
           </div>
         </div>
@@ -1014,7 +1074,7 @@
           <span class="block-row-label">Patient conscious on arrival</span>
           <div class="block-row-control">
             <div class="pill-group">
-              <button class="pill-btn active" onclick="togglePill(this)">Yes</button>
+              <button class="pill-btn" data-live-active onclick="togglePill(this)">Yes</button>
               <button class="pill-btn" onclick="togglePill(this)">No</button>
             </div>
           </div>
@@ -1025,8 +1085,8 @@
           <span class="block-row-label">Chief complaint</span>
           <div class="block-row-control">
             <div class="ai-wrap">
-              <span class="ai-spark">✦</span>
-              <input class="form-input" type="text" value="crushing retrosternal chest pain radiating to the left arm" style="border-color:#2563eb;" />
+              <span class="ai-spark" data-tooltip="The patient described 'crushing retrosternal chest pain radiating to the left arm'. This directly answers the 'Chief complaint' question.">✦</span>
+              <input class="form-input" type="text" data-live-value="crushing retrosternal chest pain radiating to the left arm" style="border-color:#2563eb;" />
             </div>
           </div>
         </div>
@@ -1036,8 +1096,8 @@
           <span class="block-row-label">Time of symptom onset</span>
           <div class="block-row-control">
             <div class="ai-wrap">
-              <span class="ai-spark">✦</span>
-              <input class="form-input form-input-sm" type="time" value="08:00" style="border-color:#2563eb;" />
+              <span class="ai-spark" data-tooltip="The clinical note states 'the pain started that morning around 08:00'. This directly answers the 'Time of symptom onset' question.">✦</span>
+              <input class="form-input form-input-sm" type="time" data-live-value="08:00" style="border-color:#2563eb;" />
             </div>
           </div>
         </div>
@@ -1047,7 +1107,7 @@
           <span class="block-row-label">Pain present</span>
           <div class="block-row-control">
             <div class="pill-group">
-              <button class="pill-btn active" onclick="togglePill(this)">Yes</button>
+              <button class="pill-btn" data-live-active onclick="togglePill(this)">Yes</button>
               <button class="pill-btn" onclick="togglePill(this)">No</button>
             </div>
           </div>
@@ -1087,8 +1147,8 @@
           <span class="block-row-label">Temperature (Celsius)</span>
           <div class="block-row-control">
             <div class="ai-wrap">
-              <span class="ai-spark">✦</span>
-              <input class="form-input form-input-sm" type="number" step="0.1" value="37.2" style="border-color:#2563eb;" />
+              <span class="ai-spark" data-tooltip="The note mentions 'body temp was normal at 37.2 degrees'. This directly answers the 'Temperature' question.">✦</span>
+              <input class="form-input form-input-sm" type="number" step="0.1" data-live-value="37.2" style="border-color:#2563eb;" />
             </div>
           </div>
         </div>
@@ -1098,8 +1158,8 @@
           <span class="block-row-label">Heart rate (bpm)</span>
           <div class="block-row-control">
             <div class="ai-wrap">
-              <span class="ai-spark">✦</span>
-              <input class="form-input form-input-sm" type="number" value="110" style="border-color:#2563eb;" />
+              <span class="ai-spark" data-tooltip="The note states 'tachycardic 110', referring to a heart rate of 110 bpm. This directly answers the 'Heart rate' question.">✦</span>
+              <input class="form-input form-input-sm" type="number" data-live-value="110" style="border-color:#2563eb;" />
             </div>
           </div>
         </div>
@@ -1109,8 +1169,8 @@
           <span class="block-row-label">Oxygen saturation (%)</span>
           <div class="block-row-control">
             <div class="ai-wrap">
-              <span class="ai-spark">✦</span>
-              <input class="form-input form-input-sm" type="number" value="94" style="border-color:#2563eb;" />
+              <span class="ai-spark" data-tooltip="The note states 'saturation down to 94%'. This directly answers the 'Oxygen saturation' question.">✦</span>
+              <input class="form-input form-input-sm" type="number" data-live-value="94" style="border-color:#2563eb;" />
             </div>
           </div>
         </div>
@@ -1241,13 +1301,31 @@
     btn.classList.toggle('active');
   }
 
+  function applyLivePopulation(on) {
+    document.querySelectorAll('[data-live-value]').forEach(input => {
+      input.value = on ? input.dataset.liveValue : '';
+      input.style.borderColor = on ? '#2563eb' : '#d1d5db';
+    });
+    document.querySelectorAll('[data-live-active]').forEach(btn => {
+      btn.classList.toggle('active', on);
+    });
+    document.querySelectorAll('.ai-spark').forEach(spark => {
+      spark.style.display = on ? '' : 'none';
+    });
+  }
+
+  // Start empty
+  applyLivePopulation(false);
+
   document.getElementById('live-checkbox').addEventListener('change', function() {
     document.getElementById('live-indicator').classList.toggle('on', this.checked);
+    applyLivePopulation(this.checked);
   });
 
   let isRecording = false;
   document.getElementById('record-toggle-btn').addEventListener('click', () => {
     isRecording = !isRecording;
+    document.getElementById('clinical-placeholder').style.display = isRecording ? 'none' : 'flex';
     document.getElementById('clinical-body').style.display = isRecording ? 'block' : 'none';
     document.getElementById('record-icon-mic').style.display = isRecording ? 'none' : 'block';
     document.getElementById('record-icon-stop').style.display = isRecording ? 'block' : 'none';
@@ -1313,6 +1391,51 @@
     document.addEventListener('mousemove', onMouseMove);
     document.addEventListener('mouseup', onMouseUp);
   });
+</script>
+
+<!-- AI tooltip -->
+<div class="ai-tooltip" id="ai-tooltip">
+  <div class="ai-tooltip-date" id="ai-tooltip-date"></div>
+  <div class="ai-tooltip-body" id="ai-tooltip-body"></div>
+  <div class="ai-tooltip-refs">
+    <span>References</span>
+    <div class="ai-tooltip-nav">
+      <button>&#9664;</button>
+      <span>1 / 1</span>
+      <button>&#9654;</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  const tooltip = document.getElementById('ai-tooltip');
+  const tooltipBody = document.getElementById('ai-tooltip-body');
+  const tooltipDate = document.getElementById('ai-tooltip-date');
+
+  document.querySelectorAll('.ai-spark').forEach(spark => {
+    spark.addEventListener('mouseenter', e => {
+      const text = spark.dataset.tooltip || 'This value was automatically populated based on the clinical note.';
+      const date = spark.dataset.tooltipDate || '22 Feb 2026, 14:00';
+      tooltipDate.textContent = 'Added ' + date;
+      tooltipBody.textContent = text;
+      tooltip.style.display = 'block';
+      positionTooltip(e);
+    });
+    spark.addEventListener('mousemove', positionTooltip);
+    spark.addEventListener('mouseleave', () => {
+      tooltip.style.display = 'none';
+    });
+  });
+
+  function positionTooltip(e) {
+    const gap = 12;
+    let x = e.clientX + gap;
+    let y = e.clientY + gap;
+    if (x + 260 > window.innerWidth) x = e.clientX - 260 - gap;
+    if (y + tooltip.offsetHeight > window.innerHeight) y = e.clientY - tooltip.offsetHeight - gap;
+    tooltip.style.left = x + 'px';
+    tooltip.style.top = y + 'px';
+  }
 </script>
 
 </body>
