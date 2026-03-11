@@ -1,0 +1,1345 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Test presets trigger conditional logic</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      font-size: 14px;
+      color: #1a1a1a;
+      background: #f3f4f6;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    /* ── TOP BAR ── */
+    .topbar {
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      align-items: center;
+      gap: 10px;
+      padding: 0 16px;
+      height: 52px;
+      background: #fff;
+      border-bottom: 1px solid #e5e7eb;
+      flex-shrink: 0;
+    }
+
+    .topbar-left {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .topbar-center {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .topbar-right {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 8px;
+    }
+
+    .topbar-title {
+      font-size: 14px;
+      font-weight: 500;
+      color: #111;
+    }
+
+    .tag {
+      display: inline-flex;
+      align-items: center;
+      padding: 3px 10px;
+      border: 1px solid #d1d5db;
+      border-radius: 20px;
+      font-size: 12px;
+      color: #374151;
+      background: #fff;
+      white-space: nowrap;
+    }
+
+
+    .icon-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 32px;
+      height: 32px;
+      border: none;
+      background: transparent;
+      border-radius: 6px;
+      cursor: pointer;
+      color: #6b7280;
+    }
+    .icon-btn:hover { background: #f3f4f6; }
+    .icon-btn svg { width: 18px; height: 18px; }
+
+    .btn {
+      padding: 6px 14px;
+      border-radius: 6px;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      border: 1px solid transparent;
+    }
+    .btn-ghost {
+      background: transparent;
+      border-color: #d1d5db;
+      color: #374151;
+    }
+    .btn-ghost:hover { background: #f9fafb; }
+    .btn-secondary {
+      background: #fff;
+      border-color: #d1d5db;
+      color: #374151;
+    }
+    .btn-secondary:hover { background: #f9fafb; }
+    .btn-primary {
+      background: #2563eb;
+      border-color: #2563eb;
+      color: #fff;
+    }
+    .btn-primary:hover { background: #1d4ed8; }
+
+    /* ── LAYOUT ── */
+    .layout {
+      display: flex;
+      flex: 1;
+      overflow: hidden;
+    }
+
+    /* ── SIDEBAR ── */
+    .sidebar {
+      width: 300px;
+      min-width: 160px;
+      max-width: 50vw;
+      background: #fff;
+      border-right: 1px solid #e5e7eb;
+      display: flex;
+      flex-direction: column;
+      flex-shrink: 0;
+      overflow-y: auto;
+      position: relative;
+    }
+
+    .sidebar-resize-handle {
+      position: absolute;
+      top: 0;
+      right: -3px;
+      width: 6px;
+      height: 100%;
+      cursor: col-resize;
+      z-index: 20;
+    }
+    .sidebar-resize-handle:hover,
+    .sidebar-resize-handle.dragging {
+      background: #2563eb33;
+    }
+
+    /* Tabs */
+    .sidebar-tabs {
+      display: flex;
+      border-bottom: 1px solid #e5e7eb;
+      flex-shrink: 0;
+    }
+    .sidebar-tab {
+      flex: 1;
+      padding: 12px 4px 10px;
+      font-size: 13px;
+      font-weight: 500;
+      color: #6b7280;
+      background: transparent;
+      border: none;
+      border-bottom: 2px solid transparent;
+      cursor: pointer;
+      text-align: center;
+      white-space: nowrap;
+      transition: color 0.15s, border-color 0.15s;
+      margin-bottom: -1px;
+    }
+    .sidebar-tab:hover { color: #374151; }
+    .sidebar-tab.active {
+      color: #2563eb;
+      border-bottom-color: #2563eb;
+    }
+
+    .tab-panel { display: none; }
+    .tab-panel.active { display: block; }
+
+    .sidebar-nav {
+      padding: 16px 16px 0;
+    }
+
+    .nav-list {
+      list-style: disc;
+      padding-left: 20px;
+      margin-bottom: 16px;
+    }
+    .nav-list li {
+      font-size: 13px;
+      color: #374151;
+      padding: 2px 0;
+      cursor: pointer;
+    }
+    .nav-list li:hover { color: #2563eb; }
+
+    .sidebar-divider {
+      border: none;
+      border-top: 1px solid #e5e7eb;
+      margin: 0 0 16px;
+    }
+
+    .sidebar-controls {
+      padding: 0 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .toggle-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 13px;
+      color: #374151;
+    }
+
+    .toggle {
+      position: relative;
+      width: 36px;
+      height: 20px;
+    }
+    .toggle input { opacity: 0; width: 0; height: 0; }
+    .toggle-slider {
+      position: absolute;
+      inset: 0;
+      background: #d1d5db;
+      border-radius: 20px;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .toggle-slider::before {
+      content: '';
+      position: absolute;
+      width: 14px;
+      height: 14px;
+      left: 3px;
+      top: 3px;
+      background: #fff;
+      border-radius: 50%;
+      transition: transform 0.2s;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+    }
+    .toggle input:checked + .toggle-slider { background: #2563eb; }
+    .toggle input:checked + .toggle-slider::before { transform: translateX(16px); }
+
+    .editor-area {
+      margin: 12px 16px 0;
+      border: 1px solid #e5e7eb;
+      border-radius: 8px;
+      overflow: hidden;
+    }
+    .editor-toolbar {
+      display: flex;
+      align-items: center;
+      gap: 2px;
+      padding: 6px 8px;
+      border-bottom: 1px solid #e5e7eb;
+    }
+    .editor-toolbar .icon-btn { width: 26px; height: 26px; }
+    .editor-toolbar .icon-btn svg { width: 14px; height: 14px; }
+    .toolbar-sep {
+      width: 1px;
+      height: 16px;
+      background: #e5e7eb;
+      margin: 0 2px;
+    }
+    .editor-body {
+      min-height: 110px;
+      padding: 8px;
+      background: #fff;
+    }
+
+    .autofill-row {
+      display: flex;
+      justify-content: flex-end;
+      padding: 12px 16px 16px;
+    }
+    .btn-link {
+      background: transparent;
+      border: none;
+      color: #2563eb;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+    }
+    .btn-link:hover { text-decoration: underline; }
+
+    /* ── MAIN CONTENT ── */
+    .main {
+      flex: 1;
+      overflow-y: auto;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* collapse toggle on the sidebar edge */
+    .sidebar-collapse {
+      position: fixed;
+      top: 60px;
+      left: 229px;
+      width: 22px;
+      height: 22px;
+      background: #fff;
+      border: 1px solid #e5e7eb;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      z-index: 100;
+      color: #9ca3af;
+    }
+    .sidebar-collapse svg { width: 12px; height: 12px; }
+    .sidebar.collapsed { width: 0 !important; min-width: 0; overflow: hidden; border-right: none; }
+
+    .content-inner {
+      padding: 16px 32px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    /* Presets bar */
+    .presets-bar {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 13px;
+      color: #6b7280;
+    }
+    .preset-chip {
+      display: inline-flex;
+      align-items: center;
+      padding: 4px 12px;
+      background: #eff6ff;
+      border: 1px solid #bfdbfe;
+      border-radius: 6px;
+      font-size: 13px;
+      color: #1d4ed8;
+      font-weight: 500;
+    }
+
+    /* Blocks */
+    .block {
+      background: #fff;
+      border: 1px solid #e5e7eb;
+      border-radius: 10px;
+      overflow: hidden;
+    }
+
+    .block-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 14px 20px;
+      cursor: pointer;
+      user-select: none;
+    }
+    .block-header svg { width: 16px; height: 16px; color: #6b7280; }
+    .block-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: #111;
+    }
+
+    .block-divider {
+      border: none;
+      border-top: 1px solid #e5e7eb;
+    }
+
+    .block-row {
+      display: flex;
+      align-items: center;
+      padding: 14px 20px;
+      gap: 16px;
+    }
+    .block-row-label {
+      font-size: 13px;
+      color: #374151;
+      min-width: 160px;
+    }
+    .block-row-control { display: flex; align-items: center; gap: 8px; }
+
+    /* Pill toggle buttons */
+    .pill-group {
+      display: inline-flex;
+      border: 1px solid #d1d5db;
+      border-radius: 999px;
+      overflow: hidden;
+    }
+    .pill-btn {
+      padding: 5px 18px;
+      font-size: 13px;
+      border: none;
+      background: transparent;
+      cursor: pointer;
+      color: #374151;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      white-space: nowrap;
+      border-radius: 999px;
+      transition: background 0.15s, color 0.15s;
+    }
+    .pill-btn:hover { background: #f3f4f6; }
+    .pill-btn.active {
+      background: #2563eb;
+      color: #fff;
+      border: 2px solid #2563eb;
+    }
+    .pill-btn.active svg { color: #fff; }
+    .pill-btn svg { width: 13px; height: 13px; }
+
+    /* Dot badge */
+    .dot-badge {
+      width: 10px;
+      height: 10px;
+      background: #3b82f6;
+      border-radius: 50%;
+      position: absolute;
+      top: -2px;
+      right: -2px;
+      border: 1.5px solid #fff;
+    }
+    .pill-group-wrap { position: relative; display: inline-flex; }
+
+    /* ── CLINICAL NOTES PANEL ── */
+    .clinical-panel {
+      background: #fff;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      height: 100%;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    }
+
+    .clinical-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 14px;
+      border-bottom: 1px solid #e5e7eb;
+      flex-shrink: 0;
+    }
+
+    .clinical-title {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      font-size: 13px;
+      font-weight: 600;
+      color: #111;
+    }
+    .clinical-title svg { width: 15px; height: 15px; color: #2563eb; }
+
+    .clinical-header-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .marker-btn {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      padding: 4px 10px;
+      border-radius: 20px;
+      border: 1px solid #d1d5db;
+      background: transparent;
+      color: #374151;
+      font-size: 11px;
+      cursor: pointer;
+    }
+    .marker-btn .dot { width: 7px; height: 7px; border-radius: 50%; background: #7c3aed; }
+
+    .live-toggle {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 11px;
+      color: #374151;
+    }
+    .live-toggle .toggle { width: 28px; height: 16px; }
+    .live-toggle .toggle-slider::before { width: 10px; height: 10px; }
+    .live-toggle input:checked + .toggle-slider { background: #7c3aed; }
+    .live-toggle input:checked + .toggle-slider::before { transform: translateX(12px); }
+
+    .clinical-body {
+      flex: 1;
+      overflow-y: auto;
+      padding: 10px 14px;
+      font-size: 12.5px;
+      line-height: 1.7;
+      color: #1f2937;
+    }
+
+    .clinical-body p { margin-bottom: 8px; }
+
+    .hl {
+      background: rgba(245, 158, 11, 0.15);
+    }
+
+    .clinical-footer {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 12px;
+      border-top: 1px solid #e5e7eb;
+      flex-shrink: 0;
+      margin-top: auto;
+      container-type: inline-size;
+    }
+    .footer-lang-model {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    @container (max-width: 320px) {
+      .footer-lang-model { display: none; }
+    }
+    .clinical-footer-sep {
+      width: 1px;
+      height: 20px;
+      background: #e5e7eb;
+      margin: 0 4px;
+    }
+
+    .lang-select {
+      appearance: none;
+      padding: 3px 22px 3px 8px;
+      border-radius: 6px;
+      border: 1px solid #d1d5db;
+      background: #f9fafb;
+      color: #374151;
+      font-size: 11px;
+      cursor: pointer;
+      min-width: auto;
+    }
+
+    .record-btn {
+      width: 32px;
+      height: 32px;
+      border-radius: 6px;
+      background: transparent;
+      border: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      flex-shrink: 0;
+      color: #6b7280;
+    }
+    .record-btn:hover { background: #f3f4f6; }
+    .record-btn svg { width: 18px; height: 18px; }
+    .record-btn.recording { background: #ef4444; color: #fff; }
+    .record-btn.recording:hover { background: #dc2626; }
+
+    @keyframes eq-bounce {
+      0%, 100% { transform: scaleY(0.35); }
+      50%       { transform: scaleY(0.85); }
+    }
+    .eq-bar {
+      transform-box: fill-box;
+      transform-origin: 50% 100%;
+      animation: eq-bounce 0.7s ease-in-out infinite;
+    }
+    .eq-bar:nth-child(2) { animation-delay: 0.18s; }
+    .eq-bar:nth-child(3) { animation-delay: 0.06s; }
+    .eq-bar:nth-child(4) { animation-delay: 0.28s; }
+    .eq-bar:nth-child(5) { animation-delay: 0.14s; }
+
+    .clinical-footer-dots {
+      font-size: 18px;
+      color: #9ca3af;
+      letter-spacing: 2px;
+      flex: 1;
+    }
+
+    .medasr-label {
+      font-size: 10px;
+      color: #6b7280;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .medasr-label .dot { width: 6px; height: 6px; border-radius: 50%; background: #f59e0b; }
+
+    .live-indicator {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: #d1d5db;
+      flex-shrink: 0;
+      transition: background 0.2s;
+    }
+    .live-indicator.on {
+      background: #a78bfa;
+      box-shadow: 0 0 0 1px rgba(167,139,250,0.2);
+    }
+    @keyframes blink-live {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.2; }
+    }
+    .live-indicator.on { animation: blink-live 1.6s ease-in-out infinite; }
+
+    /* ── IDLE STATE ── */
+    .clinical-idle {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 14px;
+      padding: 24px;
+    }
+    .mic-btn {
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      background: #374151;
+      border: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      color: #fff;
+      flex-shrink: 0;
+      transition: background 0.15s;
+    }
+    .mic-btn:hover { background: #1f2937; }
+    .mic-btn svg { width: 22px; height: 22px; }
+    .clinical-idle p {
+      font-size: 13px;
+      color: #9ca3af;
+      text-align: center;
+    }
+
+    /* tab-panel for input fills height */
+    #tab-input { height: calc(100% - 44px); display: none; flex-direction: column; }
+    #tab-input.active { display: flex; }
+    #tab-input .sidebar-nav { flex: 1; display: flex; flex-direction: column; padding: 10px; overflow: hidden; }
+
+    /* ── FORM INPUTS ── */
+    .form-input {
+      padding: 6px 12px;
+      border: 1px solid #d1d5db;
+      border-radius: 8px;
+      font-size: 13px;
+      color: #111;
+      background: #fff;
+      min-width: 200px;
+      outline: none;
+    }
+    .form-input:focus { border-color: #2563eb; box-shadow: 0 0 0 2px #2563eb22; }
+    .form-input::placeholder { color: #9ca3af; }
+
+    .form-input-sm {
+      min-width: 100px;
+      max-width: 120px;
+    }
+
+    /* AI-filled input wrapper */
+    .ai-wrap {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+    }
+    .ai-wrap .form-input {
+      border-color: #2563eb;
+    }
+    .ai-spark {
+      position: absolute;
+      left: -5px;
+      top: -5px;
+      width: 11px;
+      height: 11px;
+      background: #7c3aed;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      font-size: 6px;
+      z-index: 1;
+    }
+
+    /* Sub-block (indented) */
+    .sub-block {
+      border-left: 2px solid #e5e7eb;
+      margin: 0 20px 0 20px;
+      background: #f9fafb;
+      border-radius: 8px;
+      margin-bottom: 4px;
+    }
+    .sub-block .block-header { padding: 10px 16px; }
+    .sub-block .block-title { font-size: 13px; }
+    .sub-block .block-row { padding: 10px 16px; }
+
+    /* Medication checkbox pills */
+    .med-pills { display: flex; flex-wrap: wrap; gap: 8px; }
+    .med-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 5px 12px;
+      border: 1px solid #d1d5db;
+      border-radius: 999px;
+      font-size: 13px;
+      color: #374151;
+      background: #fff;
+      cursor: pointer;
+      position: relative;
+      user-select: none;
+    }
+    .med-pill.checked {
+      border-color: #2563eb;
+      background: #fff;
+    }
+    .med-pill .check-box {
+      width: 14px;
+      height: 14px;
+      border: 1.5px solid #d1d5db;
+      border-radius: 3px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .med-pill.checked .check-box {
+      background: #2563eb;
+      border-color: #2563eb;
+    }
+    .med-pill.checked .check-box svg { display: block; }
+    .med-pill .check-box svg { display: none; width: 9px; height: 9px; color: #fff; }
+    .med-pill .ai-spark-inline {
+      position: absolute;
+      top: -6px;
+      left: -6px;
+      width: 14px;
+      height: 14px;
+      background: #7c3aed;
+      border-radius: 3px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      font-size: 8px;
+    }
+
+    /* Select dropdown */
+    .select-wrap {
+      position: relative;
+    }
+    select {
+      appearance: none;
+      padding: 6px 32px 6px 12px;
+      border: 1px solid #d1d5db;
+      border-radius: 8px;
+      font-size: 13px;
+      color: #9ca3af;
+      background: #fff;
+      cursor: pointer;
+      min-width: 160px;
+    }
+    .select-arrow {
+      position: absolute;
+      right: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      pointer-events: none;
+      color: #9ca3af;
+    }
+    .select-arrow svg { width: 14px; height: 14px; display: block; }
+
+    /* ── RESPONSIVE: narrow screen → sidebar moves to bottom ── */
+    @media (max-width: 768px) {
+      .layout {
+        flex-direction: column-reverse;
+      }
+      .sidebar {
+        width: 100% !important;
+        max-width: 100% !important;
+        min-width: 0;
+        height: 45vh;
+        min-height: 120px;
+        max-height: 70vh;
+        border-right: none;
+        border-top: 1px solid #e5e7eb;
+        overflow-x: hidden;
+        overflow-y: auto;
+      }
+      .sidebar-resize-handle {
+        top: -3px;
+        right: 0;
+        left: 0;
+        width: 100%;
+        height: 6px;
+        cursor: row-resize;
+      }
+      .sidebar-collapse {
+        display: none;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<!-- TOP BAR -->
+<header class="topbar">
+  <div class="topbar-left"></div>
+
+  <div class="topbar-center">
+    <span class="topbar-title">Test presets trigger conditional logic</span>
+  </div>
+
+  <div class="topbar-right">
+  <!-- Settings -->
+  <button class="icon-btn" title="Settings">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+      <circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+    </svg>
+  </button>
+
+  <!-- Undo -->
+  <button class="icon-btn" title="Undo">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+      <path d="M3 7v6h6"/><path d="M3 13C5.5 7 11 5 15 7s6 8 3 13"/>
+    </svg>
+  </button>
+
+  <!-- Redo -->
+  <button class="icon-btn" title="Redo">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+      <path d="M21 7v6h-6"/><path d="M21 13C18.5 7 13 5 9 7S3 15 6 20"/>
+    </svg>
+  </button>
+
+<button class="btn btn-secondary">Cancel</button>
+  <button class="btn btn-secondary">Save and close</button>
+  <button class="btn btn-primary">Submit</button>
+  </div>
+</header>
+
+<!-- LAYOUT -->
+<div class="layout">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+
+    <!-- Tabs -->
+    <div class="sidebar-tabs">
+      <button class="sidebar-tab active" onclick="switchTab(this, 'tab-nav')">Navigation</button>
+      <button class="sidebar-tab" onclick="switchTab(this, 'tab-input')">Notes</button>
+      <button class="sidebar-tab" onclick="switchTab(this, 'tab-output')">Text report</button>
+    </div>
+
+    <!-- Tab: Content navigation -->
+    <div class="tab-panel active" id="tab-nav">
+      <div class="sidebar-nav">
+        <ul class="nav-list">
+          <li>Emergency Assessment</li>
+          <li>Vital Signs</li>
+          <li>Current medications</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Tab: Input -->
+    <div class="tab-panel" id="tab-input">
+      <div class="sidebar-nav">
+        <div class="clinical-panel">
+
+          <!-- Body (hidden until recording) -->
+          <div class="clinical-body" id="clinical-body" style="display:none;">
+            <p><span class="hl">So, this is a 62-year-old male who came in yesterday afternoon at 02:00 o'clock with crushing retrosternal chest pain radiating to the left arm.</span></p>
+            <p><span class="hl">He was alert on arrival. GCS 15. The pain started that morning around 08:00 o'clock. He rates the pain an 8/10. Vitals were concerning. Tachycardic 110. Saturation down to 94%. Body temp was normal at 37.2 degrees. Retriage as critical.</span></p>
+            <p><span class="hl">He is on aspirin 100 mg daily p.o., metformin 500 mg b.i.d. orally for his type 2, and atorvastatin 20 mg once daily oral.</span></p>
+          </div>
+
+          <!-- Footer (always visible) -->
+          <div class="clinical-footer" id="clinical-footer">
+            <!-- Left: file icon + mic + lang/model -->
+            <button class="icon-btn" title="Attach file" style="flex-shrink:0; color:#6b7280;">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" width="18" height="18">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                <polyline points="14 2 14 8 20 8"/>
+                <line x1="12" y1="11" x2="12" y2="17"/>
+                <line x1="9" y1="14" x2="15" y2="14"/>
+              </svg>
+            </button>
+            <button class="record-btn" id="record-toggle-btn" title="Start recording">
+              <svg id="record-icon-mic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="9" y="2" width="6" height="11" rx="3"/>
+                <path d="M19 10a7 7 0 0 1-14 0"/>
+                <line x1="12" y1="19" x2="12" y2="22"/>
+                <line x1="8" y1="22" x2="16" y2="22"/>
+              </svg>
+              <svg id="record-icon-stop" viewBox="0 0 22 18" fill="currentColor" style="display:none;" width="22" height="18" opacity="0.85">
+                <!-- stop square on the left -->
+                <rect x="0" y="5" width="8" height="8" rx="1.5"/>
+                <!-- animated bars on the right -->
+                <rect class="eq-bar" x="11"   y="2" width="2.5" height="14" rx="1.25"/>
+                <rect class="eq-bar" x="15"   y="2" width="2.5" height="14" rx="1.25"/>
+                <rect class="eq-bar" x="19"   y="2" width="2.5" height="14" rx="1.25"/>
+              </svg>
+            </button>
+            <div class="footer-lang-model">
+              <div class="select-wrap">
+                <select class="lang-select">
+                  <option>EN</option>
+                  <option>NL</option>
+                  <option>FR</option>
+                  <option>DE</option>
+                </select>
+                <span class="select-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></span>
+              </div>
+              <div class="select-wrap">
+                <select class="lang-select">
+                  <option>MEDASR</option>
+                  <option>Squire</option>
+                  <option>Dragon</option>
+                  <option>Corti</option>
+                </select>
+                <span class="select-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></span>
+              </div>
+            </div>
+
+            <!-- Right: live toggle -->
+            <div class="live-toggle" style="margin-left:auto;">
+              <label class="toggle">
+                <input type="checkbox" id="live-checkbox" />
+                <span class="toggle-slider"></span>
+              </label>
+              Live population
+              <span class="live-indicator" id="live-indicator"></span>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- Tab: Text output -->
+    <div class="tab-panel" id="tab-output">
+      <div class="sidebar-nav" style="padding: 14px 16px; font-size: 13px; color: #1f2937; line-height: 1.7;">
+        <p style="margin-bottom: 10px;"><strong>Emergency Assessment</strong></p>
+        <p style="margin-bottom: 6px;">A 62-year-old male presented to the emergency department on 22/02/2026 at 14:00 with a chief complaint of crushing retrosternal chest pain radiating to the left arm. Symptom onset was reported at 08:00. The patient was conscious and alert on arrival (GCS 15). Pain severity was rated 8/10. Triage level: <strong>Critical</strong>.</p>
+
+        <div style="margin: 12px 0;"></div>
+
+        <p style="margin-bottom: 10px;"><strong>Vital Signs</strong></p>
+        <p style="margin-bottom: 4px;">Temperature: 37.2 °C</p>
+        <p style="margin-bottom: 4px;">Heart rate: 110 bpm (tachycardic)</p>
+        <p style="margin-bottom: 6px;">Oxygen saturation: 94%</p>
+
+        <div style="margin: 12px 0;"></div>
+
+        <p style="margin-bottom: 10px;"><strong>Current Medications</strong></p>
+        <p style="margin-bottom: 4px;">Aspirin 100 mg — once daily — oral</p>
+        <p style="margin-bottom: 4px;">Metformin 500 mg — b.i.d. — oral (type 2 diabetes)</p>
+        <p style="margin-bottom: 6px;">Atorvastatin 20 mg — once daily — oral</p>
+      </div>
+    </div>
+
+    <!-- Drag handle -->
+    <div class="sidebar-resize-handle" id="resizeHandle"></div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+    <!-- Sidebar collapse handle -->
+    <div class="sidebar-collapse" title="Collapse sidebar">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
+    </div>
+
+    <div class="content-inner">
+
+      <!-- Presets bar -->
+      <div class="presets-bar">
+        <span>Presets:</span>
+        <span class="btn btn-secondary" style="cursor:default;">Critical triage</span>
+      </div>
+
+      <!-- Block: Emergency Assessment -->
+      <div class="block">
+        <div class="block-header">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="18 15 12 9 6 15"/></svg>
+          <span class="block-title">Emergency Assessment</span>
+        </div>
+        <hr class="block-divider" />
+
+        <div class="block-row">
+          <span class="block-row-label">Patient name</span>
+          <div class="block-row-control">
+            <input class="form-input" type="text" placeholder="Placeholder" />
+          </div>
+        </div>
+        <hr class="block-divider" />
+
+        <div class="block-row">
+          <span class="block-row-label">Admission date and time</span>
+          <div class="block-row-control">
+            <div class="ai-wrap">
+              <span class="ai-spark">✦</span>
+              <input class="form-input" type="datetime-local" value="2026-02-22T14:00" style="border-color:#2563eb;" />
+            </div>
+          </div>
+        </div>
+        <hr class="block-divider" />
+
+        <div class="block-row">
+          <span class="block-row-label">Patient conscious on arrival</span>
+          <div class="block-row-control">
+            <div class="pill-group">
+              <button class="pill-btn active" onclick="togglePill(this)">Yes</button>
+              <button class="pill-btn" onclick="togglePill(this)">No</button>
+            </div>
+          </div>
+        </div>
+        <hr class="block-divider" />
+
+        <div class="block-row">
+          <span class="block-row-label">Chief complaint</span>
+          <div class="block-row-control">
+            <div class="ai-wrap">
+              <span class="ai-spark">✦</span>
+              <input class="form-input" type="text" value="crushing retrosternal chest pain radiating to the left arm" style="border-color:#2563eb;" />
+            </div>
+          </div>
+        </div>
+        <hr class="block-divider" />
+
+        <div class="block-row">
+          <span class="block-row-label">Time of symptom onset</span>
+          <div class="block-row-control">
+            <div class="ai-wrap">
+              <span class="ai-spark">✦</span>
+              <input class="form-input form-input-sm" type="time" value="08:00" style="border-color:#2563eb;" />
+            </div>
+          </div>
+        </div>
+        <hr class="block-divider" />
+
+        <div class="block-row">
+          <span class="block-row-label">Pain present</span>
+          <div class="block-row-control">
+            <div class="pill-group">
+              <button class="pill-btn active" onclick="togglePill(this)">Yes</button>
+              <button class="pill-btn" onclick="togglePill(this)">No</button>
+            </div>
+          </div>
+        </div>
+        <hr class="block-divider" />
+
+        <div class="block-row">
+          <span class="block-row-label">Pain severity (0–10 scale)</span>
+          <div class="block-row-control">
+            <input class="form-input form-input-sm" type="number" min="0" max="10" placeholder="" />
+          </div>
+        </div>
+        <hr class="block-divider" />
+
+        <div class="block-row">
+          <span class="block-row-label">Triage level</span>
+          <div class="block-row-control" style="flex-wrap:wrap;gap:8px;">
+            <div class="pill-group" style="border:none;gap:8px;flex-wrap:wrap;">
+              <button class="pill-btn" style="border:1px solid #d1d5db;border-radius:999px;" onclick="togglePill(this)">Critical</button>
+              <button class="pill-btn" style="border:1px solid #d1d5db;border-radius:999px;" onclick="togglePill(this)">Urgent</button>
+              <button class="pill-btn" style="border:1px solid #d1d5db;border-radius:999px;" onclick="togglePill(this)">Semi-urgent</button>
+              <button class="pill-btn" style="border:1px solid #d1d5db;border-radius:999px;" onclick="togglePill(this)">Non-urgent</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Block: Vital Signs -->
+      <div class="block">
+        <div class="block-header">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="18 15 12 9 6 15"/></svg>
+          <span class="block-title">Vital Signs</span>
+        </div>
+        <hr class="block-divider" />
+
+        <div class="block-row">
+          <span class="block-row-label">Temperature (Celsius)</span>
+          <div class="block-row-control">
+            <div class="ai-wrap">
+              <span class="ai-spark">✦</span>
+              <input class="form-input form-input-sm" type="number" step="0.1" value="37.2" style="border-color:#2563eb;" />
+            </div>
+          </div>
+        </div>
+        <hr class="block-divider" />
+
+        <div class="block-row">
+          <span class="block-row-label">Heart rate (bpm)</span>
+          <div class="block-row-control">
+            <div class="ai-wrap">
+              <span class="ai-spark">✦</span>
+              <input class="form-input form-input-sm" type="number" value="110" style="border-color:#2563eb;" />
+            </div>
+          </div>
+        </div>
+        <hr class="block-divider" />
+
+        <div class="block-row">
+          <span class="block-row-label">Oxygen saturation (%)</span>
+          <div class="block-row-control">
+            <div class="ai-wrap">
+              <span class="ai-spark">✦</span>
+              <input class="form-input form-input-sm" type="number" value="94" style="border-color:#2563eb;" />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Block: Current medications -->
+      <div class="block">
+        <div class="block-header" style="justify-content:space-between;">
+          <div style="display:flex;align-items:center;gap:8px;">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="18 15 12 9 6 15"/></svg>
+            <span class="block-title">Current medications</span>
+          </div>
+        </div>
+        <hr class="block-divider" />
+
+        <!-- Aspirin sub-block -->
+        <div style="padding:12px 20px;display:flex;flex-direction:column;gap:8px;">
+          <div class="sub-block">
+            <div class="block-header">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="18 15 12 9 6 15"/></svg>
+              <span class="block-title">Aspirin</span>
+            </div>
+            <hr class="block-divider" />
+            <div class="block-row">
+              <span class="block-row-label">Dosage</span>
+              <div class="block-row-control">
+                <div class="ai-wrap">
+                  <span class="ai-spark">✦</span>
+                  <input class="form-input" type="text" value="100 mg" style="border-color:#2563eb;" />
+                </div>
+              </div>
+            </div>
+            <hr class="block-divider" />
+            <div class="block-row">
+              <span class="block-row-label">Frequency</span>
+              <div class="block-row-control">
+                <div class="ai-wrap">
+                  <span class="ai-spark">✦</span>
+                  <input class="form-input" type="text" value="daily" style="border-color:#2563eb;" />
+                </div>
+              </div>
+            </div>
+            <hr class="block-divider" />
+            <div class="block-row">
+              <span class="block-row-label">Route</span>
+              <div class="block-row-control" style="flex-wrap:wrap;gap:8px;">
+                <div class="ai-wrap" style="position:relative;">
+                  <span class="ai-spark">✦</span>
+                </div>
+                <div class="pill-group" style="border:none;gap:8px;flex-wrap:wrap;">
+                  <button class="pill-btn active" style="border:1px solid #2563eb;border-radius:999px;background:#eff6ff;color:#1d4ed8;" onclick="togglePill(this)">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="width:12px;height:12px;"><polyline points="20 6 9 17 4 12"/></svg>
+                    Oral
+                  </button>
+                  <button class="pill-btn" style="border:1px solid #d1d5db;border-radius:999px;" onclick="togglePill(this)">Intravenous</button>
+                  <button class="pill-btn" style="border:1px solid #d1d5db;border-radius:999px;" onclick="togglePill(this)">Intramuscular</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Metformin sub-block -->
+          <div class="sub-block">
+            <div class="block-header">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="18 15 12 9 6 15"/></svg>
+              <span class="block-title">Metformin</span>
+            </div>
+            <hr class="block-divider" />
+            <div class="block-row">
+              <span class="block-row-label">Dosage</span>
+              <div class="block-row-control">
+                <div class="ai-wrap">
+                  <span class="ai-spark">✦</span>
+                  <input class="form-input" type="text" value="500 mg" style="border-color:#2563eb;" />
+                </div>
+              </div>
+            </div>
+            <hr class="block-divider" />
+            <div class="block-row">
+              <span class="block-row-label">Frequency</span>
+              <div class="block-row-control">
+                <div class="ai-wrap">
+                  <span class="ai-spark">✦</span>
+                  <input class="form-input" type="text" value="b.i.d." style="border-color:#2563eb;" />
+                </div>
+              </div>
+            </div>
+            <hr class="block-divider" />
+            <div class="block-row">
+              <span class="block-row-label">Route</span>
+              <div class="block-row-control" style="flex-wrap:wrap;gap:8px;">
+                <div class="pill-group" style="border:none;gap:8px;flex-wrap:wrap;">
+                  <button class="pill-btn active" style="border:1px solid #2563eb;border-radius:999px;background:#eff6ff;color:#1d4ed8;" onclick="togglePill(this)">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="width:12px;height:12px;"><polyline points="20 6 9 17 4 12"/></svg>
+                    Oral
+                  </button>
+                  <button class="pill-btn" style="border:1px solid #d1d5db;border-radius:999px;" onclick="togglePill(this)">Intravenous</button>
+                  <button class="pill-btn" style="border:1px solid #d1d5db;border-radius:999px;" onclick="togglePill(this)">Intramuscular</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Atorvastatin sub-block -->
+          <div class="sub-block">
+            <div class="block-header">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="18 15 12 9 6 15"/></svg>
+              <span class="block-title">Atorvastatin</span>
+            </div>
+            <hr class="block-divider" />
+            <div class="block-row">
+              <span class="block-row-label">Dosage</span>
+              <div class="block-row-control">
+                <div class="ai-wrap">
+                  <span class="ai-spark">✦</span>
+                  <input class="form-input" type="text" value="20 mg" style="border-color:#2563eb;" />
+                </div>
+              </div>
+            </div>
+            <hr class="block-divider" />
+            <div class="block-row">
+              <span class="block-row-label">Frequency</span>
+              <div class="block-row-control">
+                <div class="ai-wrap">
+                  <span class="ai-spark">✦</span>
+                  <input class="form-input" type="text" value="once daily" style="border-color:#2563eb;" />
+                </div>
+              </div>
+            </div>
+            <hr class="block-divider" />
+            <div class="block-row">
+              <span class="block-row-label">Route</span>
+              <div class="block-row-control" style="flex-wrap:wrap;gap:8px;">
+                <div class="pill-group" style="border:none;gap:8px;flex-wrap:wrap;">
+                  <button class="pill-btn active" style="border:1px solid #2563eb;border-radius:999px;background:#eff6ff;color:#1d4ed8;" onclick="togglePill(this)">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="width:12px;height:12px;"><polyline points="20 6 9 17 4 12"/></svg>
+                    Oral
+                  </button>
+                  <button class="pill-btn" style="border:1px solid #d1d5db;border-radius:999px;" onclick="togglePill(this)">Intravenous</button>
+                  <button class="pill-btn" style="border:1px solid #d1d5db;border-radius:999px;" onclick="togglePill(this)">Intramuscular</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </main>
+</div>
+
+<script>
+  function togglePill(btn) {
+    btn.classList.toggle('active');
+  }
+
+  document.getElementById('live-checkbox').addEventListener('change', function() {
+    document.getElementById('live-indicator').classList.toggle('on', this.checked);
+  });
+
+  let isRecording = false;
+  document.getElementById('record-toggle-btn').addEventListener('click', () => {
+    isRecording = !isRecording;
+    document.getElementById('clinical-body').style.display = isRecording ? 'block' : 'none';
+    document.getElementById('record-icon-mic').style.display = isRecording ? 'none' : 'block';
+    document.getElementById('record-icon-stop').style.display = isRecording ? 'block' : 'none';
+    document.getElementById('record-toggle-btn').classList.toggle('recording', isRecording);
+  });
+
+  function switchTab(btn, panelId) {
+    document.querySelectorAll('.sidebar-tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById(panelId).classList.add('active');
+  }
+
+  const collapseBtn = document.querySelector('.sidebar-collapse');
+  const collapseIcon = collapseBtn.querySelector('svg polyline');
+  const sidebarEl = document.querySelector('.sidebar');
+
+  function updateCollapsePos() {
+    collapseBtn.style.left = (sidebarEl.offsetWidth - 11) + 'px';
+  }
+  updateCollapsePos();
+
+  collapseBtn.addEventListener('click', () => {
+    const isCollapsed = sidebarEl.classList.toggle('collapsed');
+    collapseIcon.setAttribute('points', isCollapsed ? '9 18 15 12 9 6' : '15 18 9 12 15 6');
+    updateCollapsePos();
+  });
+
+  const handle = document.getElementById('resizeHandle');
+  const sidebar = handle.closest('.sidebar');
+  let startX, startY, startWidth, startHeight;
+
+  handle.addEventListener('mousedown', e => {
+    const isVertical = window.innerWidth <= 768;
+    startX = e.clientX;
+    startY = e.clientY;
+    startWidth = sidebar.offsetWidth;
+    startHeight = sidebar.offsetHeight;
+    handle.classList.add('dragging');
+    document.body.style.cursor = isVertical ? 'row-resize' : 'col-resize';
+    document.body.style.userSelect = 'none';
+
+    function onMouseMove(e) {
+      if (window.innerWidth <= 768) {
+        // vertical: drag up = bigger sidebar
+        const newHeight = Math.min(window.innerHeight * 0.7, Math.max(120, startHeight - (e.clientY - startY)));
+        sidebar.style.height = newHeight + 'px';
+      } else {
+        const newWidth = Math.min(window.innerWidth / 2, Math.max(160, startWidth + (e.clientX - startX)));
+        sidebar.style.width = newWidth + 'px';
+        updateCollapsePos();
+      }
+    }
+
+    function onMouseUp() {
+      handle.classList.remove('dragging');
+      document.body.style.cursor = '';
+      document.body.style.userSelect = '';
+      document.removeEventListener('mousemove', onMouseMove);
+      document.removeEventListener('mouseup', onMouseUp);
+    }
+
+    document.addEventListener('mousemove', onMouseMove);
+    document.addEventListener('mouseup', onMouseUp);
+  });
+</script>
+
+</body>
+</html>
