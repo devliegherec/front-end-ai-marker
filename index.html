@@ -388,7 +388,6 @@
       display: inline-flex;
       border: 1px solid #d1d5db;
       border-radius: 999px;
-      overflow: hidden;
     }
     .pill-btn {
       padding: 5px 18px;
@@ -685,6 +684,25 @@
       font-size: 6px;
       z-index: 1;
       cursor: default;
+    }
+
+    [data-live-active].active {
+      position: relative;
+    }
+    [data-live-active].active::before {
+      content: '✦';
+      position: absolute;
+      left: -5px;
+      top: -5px;
+      width: 11px;
+      height: 11px;
+      background: #7c3aed;
+      border-radius: 50%;
+      color: #fff;
+      font-size: 6px;
+      line-height: 11px;
+      text-align: center;
+      z-index: 1;
     }
 
     .ai-tooltip {
@@ -1198,7 +1216,7 @@
               <span class="block-row-label">Dosage</span>
               <div class="block-row-control" style="flex-wrap:wrap;gap:6px;">
                 <button class="pill-btn" style="border:1px solid #d1d5db;border-radius:999px;" onclick="togglePill(this)">50 mg</button>
-                <button class="pill-btn" style="border:1px solid #d1d5db;border-radius:999px;" onclick="togglePill(this)">100 mg</button>
+                <button class="pill-btn" data-live-active style="border:1px solid #d1d5db;border-radius:999px;" onclick="togglePill(this)">100 mg</button>
                 <button class="pill-btn" style="border:1px solid #d1d5db;border-radius:999px;" onclick="togglePill(this)">300 mg</button>
               </div>
             </div>
@@ -1206,7 +1224,7 @@
             <div class="block-row">
               <span class="block-row-label">Frequency</span>
               <div class="block-row-control" style="flex-wrap:wrap;gap:6px;">
-                <button class="pill-btn" style="border:1px solid #d1d5db;border-radius:999px;" onclick="togglePill(this)">Once daily</button>
+                <button class="pill-btn" data-live-active style="border:1px solid #d1d5db;border-radius:999px;" onclick="togglePill(this)">Once daily</button>
                 <button class="pill-btn" style="border:1px solid #d1d5db;border-radius:999px;" onclick="togglePill(this)">Twice daily</button>
               </div>
             </div>
@@ -1214,7 +1232,7 @@
             <div class="block-row">
               <span class="block-row-label">Route</span>
               <div class="block-row-control" style="flex-wrap:wrap;gap:6px;">
-                <button class="pill-btn" style="border:1px solid #d1d5db;border-radius:999px;" onclick="togglePill(this)">Oral</button>
+                <button class="pill-btn" data-live-active style="border:1px solid #d1d5db;border-radius:999px;" onclick="togglePill(this)">Oral</button>
                 <button class="pill-btn" style="border:1px solid #d1d5db;border-radius:999px;" onclick="togglePill(this)">Intravenous</button>
                 <button class="pill-btn" style="border:1px solid #d1d5db;border-radius:999px;" onclick="togglePill(this)">Intramuscular</button>
               </div>
@@ -1231,7 +1249,7 @@
             <div class="block-row">
               <span class="block-row-label">Dosage</span>
               <div class="block-row-control" style="flex-wrap:wrap;gap:6px;">
-                <button class="pill-btn" style="border:1px solid #d1d5db;border-radius:999px;" onclick="togglePill(this)">500 mg</button>
+                <button class="pill-btn" data-live-active style="border:1px solid #d1d5db;border-radius:999px;" onclick="togglePill(this)">500 mg</button>
                 <button class="pill-btn" style="border:1px solid #d1d5db;border-radius:999px;" onclick="togglePill(this)">850 mg</button>
                 <button class="pill-btn" style="border:1px solid #d1d5db;border-radius:999px;" onclick="togglePill(this)">1000 mg</button>
               </div>
@@ -1241,7 +1259,7 @@
               <span class="block-row-label">Frequency</span>
               <div class="block-row-control" style="flex-wrap:wrap;gap:6px;">
                 <button class="pill-btn" style="border:1px solid #d1d5db;border-radius:999px;" onclick="togglePill(this)">Once daily</button>
-                <button class="pill-btn" style="border:1px solid #d1d5db;border-radius:999px;" onclick="togglePill(this)">Twice daily</button>
+                <button class="pill-btn" data-live-active style="border:1px solid #d1d5db;border-radius:999px;" onclick="togglePill(this)">Twice daily</button>
                 <button class="pill-btn" style="border:1px solid #d1d5db;border-radius:999px;" onclick="togglePill(this)">Three times daily</button>
               </div>
             </div>
@@ -1249,7 +1267,7 @@
             <div class="block-row">
               <span class="block-row-label">Route</span>
               <div class="block-row-control" style="flex-wrap:wrap;gap:6px;">
-                <button class="pill-btn" style="border:1px solid #d1d5db;border-radius:999px;" onclick="togglePill(this)">Oral</button>
+                <button class="pill-btn" data-live-active style="border:1px solid #d1d5db;border-radius:999px;" onclick="togglePill(this)">Oral</button>
                 <button class="pill-btn" style="border:1px solid #d1d5db;border-radius:999px;" onclick="togglePill(this)">Intravenous</button>
                 <button class="pill-btn" style="border:1px solid #d1d5db;border-radius:999px;" onclick="togglePill(this)">Intramuscular</button>
               </div>
@@ -1267,7 +1285,7 @@
               <span class="block-row-label">Dosage</span>
               <div class="block-row-control" style="flex-wrap:wrap;gap:6px;">
                 <button class="pill-btn" style="border:1px solid #d1d5db;border-radius:999px;" onclick="togglePill(this)">10 mg</button>
-                <button class="pill-btn" style="border:1px solid #d1d5db;border-radius:999px;" onclick="togglePill(this)">20 mg</button>
+                <button class="pill-btn" data-live-active style="border:1px solid #d1d5db;border-radius:999px;" onclick="togglePill(this)">20 mg</button>
                 <button class="pill-btn" style="border:1px solid #d1d5db;border-radius:999px;" onclick="togglePill(this)">40 mg</button>
                 <button class="pill-btn" style="border:1px solid #d1d5db;border-radius:999px;" onclick="togglePill(this)">80 mg</button>
               </div>
@@ -1276,14 +1294,14 @@
             <div class="block-row">
               <span class="block-row-label">Frequency</span>
               <div class="block-row-control" style="flex-wrap:wrap;gap:6px;">
-                <button class="pill-btn" style="border:1px solid #d1d5db;border-radius:999px;" onclick="togglePill(this)">Once daily</button>
+                <button class="pill-btn" data-live-active style="border:1px solid #d1d5db;border-radius:999px;" onclick="togglePill(this)">Once daily</button>
               </div>
             </div>
             <hr class="block-divider" />
             <div class="block-row">
               <span class="block-row-label">Route</span>
               <div class="block-row-control" style="flex-wrap:wrap;gap:6px;">
-                <button class="pill-btn" style="border:1px solid #d1d5db;border-radius:999px;" onclick="togglePill(this)">Oral</button>
+                <button class="pill-btn" data-live-active style="border:1px solid #d1d5db;border-radius:999px;" onclick="togglePill(this)">Oral</button>
                 <button class="pill-btn" style="border:1px solid #d1d5db;border-radius:999px;" onclick="togglePill(this)">Intravenous</button>
                 <button class="pill-btn" style="border:1px solid #d1d5db;border-radius:999px;" onclick="togglePill(this)">Intramuscular</button>
               </div>
