@@ -669,6 +669,27 @@
     .ai-wrap .form-input {
       border-color: #2563eb;
     }
+    .copy-report-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 11px;
+      color: #6b7280;
+      background: none;
+      border: none;
+      padding: 2px 4px;
+      cursor: pointer;
+    }
+    .copy-report-btn:hover {
+      background: #f3f4f6;
+    }
+    #copy-report-label {
+      display: none;
+    }
+    .copy-report-btn:hover #copy-report-label {
+      display: inline;
+    }
+
     .ai-spark {
       position: absolute;
       left: -5px;
@@ -684,6 +705,26 @@
       font-size: 6px;
       z-index: 1;
       cursor: default;
+    }
+
+    .fx-spark {
+      position: absolute;
+      left: -5px;
+      top: -5px;
+      width: 11px;
+      height: 11px;
+      background: #d97706;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      font-size: 5px;
+      font-weight: 700;
+      font-family: monospace;
+      z-index: 1;
+      cursor: default;
+      letter-spacing: -0.5px;
     }
 
     [data-live-active].active {
@@ -1022,8 +1063,11 @@
 
     <!-- Tab: Text output -->
     <div class="tab-panel" id="tab-output">
-      <div class="sidebar-nav" style="padding: 14px 16px; font-size: 13px; color: #1f2937; line-height: 1.7;">
-        <p style="margin-bottom: 10px;"><strong>Emergency Assessment</strong></p>
+      <div id="report-text" class="sidebar-nav report-hover-area" style="padding: 14px 16px; font-size: 13px; color: #1f2937; line-height: 1.7;">
+        <p style="margin-bottom: 10px; display:flex; align-items:center; justify-content:space-between;"><strong>Emergency Assessment</strong><button id="copy-report-btn" onclick="copyReport()" class="copy-report-btn">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+          <span id="copy-report-label">Copy</span>
+        </button></p>
         <p style="margin-bottom: 6px;">A 62-year-old male presented to the emergency department on 22/02/2026 at 14:00 with a chief complaint of crushing retrosternal chest pain radiating to the left arm. Symptom onset was reported at 08:00. The patient was conscious and alert on arrival (GCS 15). Pain severity was rated 8/10. Triage level: <strong>Critical</strong>.</p>
 
         <div style="margin: 12px 0;"></div>
@@ -1069,13 +1113,7 @@
         </div>
         <hr class="block-divider" />
 
-        <div class="block-row">
-          <span class="block-row-label">Patient name</span>
-          <div class="block-row-control">
-            <input class="form-input" type="text" placeholder="Placeholder" />
-          </div>
-        </div>
-        <hr class="block-divider" />
+
 
         <div class="block-row">
           <span class="block-row-label">Admission date and time</span>
@@ -1135,7 +1173,10 @@
         <div class="block-row">
           <span class="block-row-label">Pain severity (0–10 scale)</span>
           <div class="block-row-control">
-            <input class="form-input form-input-sm" type="number" min="0" max="10" placeholder="" />
+            <div class="ai-wrap">
+              <span class="fx-spark">fx</span>
+              <input class="form-input form-input-sm" type="number" min="0" max="10" data-live-value="4" style="border-color:#2563eb;" />
+            </div>
           </div>
         </div>
         <hr class="block-divider" />
@@ -1319,6 +1360,15 @@
     btn.classList.toggle('active');
   }
 
+  function copyReport() {
+    const text = document.getElementById('report-text').innerText;
+    navigator.clipboard.writeText(text).then(() => {
+      const label = document.getElementById('copy-report-label');
+      label.textContent = 'Copied!';
+      setTimeout(() => label.textContent = 'Copy', 2000);
+    });
+  }
+
   function applyLivePopulation(on) {
     document.querySelectorAll('[data-live-value]').forEach(input => {
       input.value = on ? input.dataset.liveValue : '';
@@ -1327,7 +1377,7 @@
     document.querySelectorAll('[data-live-active]').forEach(btn => {
       btn.classList.toggle('active', on);
     });
-    document.querySelectorAll('.ai-spark').forEach(spark => {
+    document.querySelectorAll('.ai-spark, .fx-spark').forEach(spark => {
       spark.style.display = on ? '' : 'none';
     });
   }
